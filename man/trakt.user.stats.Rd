@@ -4,13 +4,16 @@
 \alias{trakt.user.stats}
 \title{Get a user's stats}
 \usage{
-trakt.user.stats(user = getOption("trakt.username"))
+trakt.user.stats(user = getOption("trakt.username"), to.data.frame = FALSE)
 }
 \arguments{
 \item{user}{Target user. Defaults to \code{getOption("trakt.username")}}
+
+\item{to.data.frame}{if \code{TRUE}, coerces the output to \code{data.frame}
+using \pkg{plyr}'s \code{rbind.fill}. Defaults to \code{FALSE}.}
 }
 \value{
-A \code{data.frame} containing stats.
+A \code{list} or \code{data.frame} containing stats.
 }
 \description{
 \code{trakt.user.stats} pulls a user's stats.
@@ -24,5 +27,14 @@ get_trakt_credentials() # Set required API data/headers
 mystats   <- trakt.user.stats() # Defaults to your username if set
 seanstats <- trakt.user.stats(user = "sean")
 }
+}
+\seealso{
+Other user: \code{\link{trakt.user.collection}};
+  \code{\link{trakt.user.followers}};
+  \code{\link{trakt.user.following}};
+  \code{\link{trakt.user.friends}};
+  \code{\link{trakt.user.ratings}};
+  \code{\link{trakt.user.watched}};
+  \code{\link{trakt.user.watchlist}}
 }
 

@@ -7,7 +7,7 @@
 trakt.search.byid(id, id_type = "trakt-show")
 }
 \arguments{
-\item{id}{The keyword used for the search. Should be as URL-compatible as possible.}
+\item{id}{The id used for the search. Will be \code{URLencode}'d.}
 
 \item{id_type}{The type of \code{id}. Defaults to \code{trakt-show}, can be
 \code{trakt-movie}, \code{trakt-show}, \code{trakt-episode}, \code{imdb},
@@ -15,7 +15,7 @@ trakt.search.byid(id, id_type = "trakt-show")
 }
 \value{
 A \code{data.frame} containing a single search result. Hopefully the one you wanted.
-If no result is foun, the return value is \code{list(error = "Nothing found")} and a \code{warning}
+If no result is found, the return value is \code{list(error = "Nothing found")} and a \code{warning}
 }
 \description{
 \code{trakt.search.byid} pulls show stats and returns it compactly.
@@ -28,5 +28,8 @@ See \href{http://docs.trakt.apiary.io/reference/search/id-lookup/get-id-lookup-r
 get_trakt_credentials() # Set required API data/headers
 breakingbad <- trakt.search.byid(1388, "trakt-show")
 }
+}
+\seealso{
+Other API, search: \code{\link{trakt.search}}
 }
 

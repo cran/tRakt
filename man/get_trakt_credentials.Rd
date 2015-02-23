@@ -17,7 +17,7 @@ get_trakt_credentials(username = NULL, client.id = NULL,
 \item{set.headers}{\code{TRUE} by default. Sets the \code{httr} headers
 for \code{GET} requests for the APIv2}
 
-\item{silent}{If TRUE (default), messages are printed showing you the API information.
+\item{silent}{If TRUE (default), no messages are printed showing you the API information.
 Mostly for debug purposes.}
 }
 \value{
@@ -27,7 +27,7 @@ Nothing. Only messages.
 \code{get_trakt_credentials} searches for your credentials and stores them
 in the appropriate \code{option} variables.
 It also sets the HTTP header required for v2 API calls.
-To make this work, place a \code{key.json} file either in the working directory
+To make this work automatically, place a \code{key.json} file either in the working directory
 or in \code{~/.config/trakt/key.json}.
 Arguments to this function take precedence over any key file.
 }
@@ -44,5 +44,8 @@ get_trakt_credentials()
 get_trakt_credentials(username = "sean",
 client.id = "12fc1de7671c7f2fb4a8ac08ba7c9f45b447f4d5bad5e11e3490823d629afdf2")
 }
+}
+\seealso{
+Other API: \code{\link{trakt.api.call}}
 }
 

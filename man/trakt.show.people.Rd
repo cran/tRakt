@@ -13,13 +13,13 @@ trakt.show.people(target, extended = "min")
 Defaults to \code{"min"}, can either be \code{"min"} or \code{"full"}}
 }
 \value{
-A \code{list} containing people info
+A \code{list} containing \code{data.frame}s for cast and crew.
 }
 \description{
 \code{trakt.show.people} pulls show people data.
 }
 \details{
-Returns all cast and crew for a show.
+Returns all cast and crew for a show, depending on how much data is available.
 }
 \note{
 See \href{http://docs.trakt.apiary.io/#reference/shows/people/get-all-people-for-a-show}{the trakt API docs for further info}
@@ -29,5 +29,16 @@ See \href{http://docs.trakt.apiary.io/#reference/shows/people/get-all-people-for
 get_trakt_credentials() # Set required API data/headers
 breakingbad.people <- trakt.show.people("breaking-bad")
 }
+}
+\seealso{
+Other show: \code{\link{trakt.getEpisodeData}};
+  \code{\link{trakt.getFullShowData}};
+  \code{\link{trakt.getSeasons}};
+  \code{\link{trakt.show.related}};
+  \code{\link{trakt.show.season}};
+  \code{\link{trakt.show.stats}};
+  \code{\link{trakt.show.summary}};
+  \code{\link{trakt.shows.popular}};
+  \code{\link{trakt.shows.trending}}
 }
 

@@ -21,7 +21,7 @@ The content of the API response, \code{jsonlite::fromJSON}'d if requested.
 }
 \description{
 \code{trakt.api.call} makes an APIv2 call to a specified URL
-and returns the output \code{jsonlite::fromJSON}'d.
+and returns the output \code{jsonlite::fromJSON}'d if requested.
 }
 \note{
 This function is heavily used internally, so why not expose it to the user.
@@ -31,5 +31,8 @@ This function is heavily used internally, so why not expose it to the user.
 get_trakt_credentials() # Set required API data/headers
 trakt.api.call("https://api-v2launch.trakt.tv/shows/breaking-bad?extended=min")
 }
+}
+\seealso{
+Other API: \code{\link{get_trakt_credentials}}
 }
 

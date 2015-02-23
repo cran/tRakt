@@ -2,7 +2,7 @@
 % Please edit documentation in R/trakt.getEpisodeData.R
 \name{trakt.getEpisodeData}
 \alias{trakt.getEpisodeData}
-\title{Get a show's episode information}
+\title{Get a show's episodes. All of them.}
 \usage{
 trakt.getEpisodeData(target, season_nums, extended = "full",
   dropunaired = TRUE)
@@ -15,7 +15,7 @@ trakt.getEpisodeData(target, season_nums, extended = "full",
 \item{extended}{Defaults to \code{full,images} to get season posters. Can be
 \code{min}, \code{images}, \code{full}, \code{full,images}}
 
-\item{dropunaired}{If \code{TRUE}, episodes which have not aired yet are dropped.}
+\item{dropunaired}{If \code{TRUE} (default), episodes which have not aired yet are dropped.}
 }
 \value{
 A \code{data.frame} containing episode details
@@ -23,13 +23,13 @@ A \code{data.frame} containing episode details
 \description{
 \code{trakt.getEpisodeData} pulls detailed episode data.
 Get details for a show's episodes, e.g. ratings, number of votes,
-airdates, urls, plot overviews…
+airdates, images, plot overviews…
 }
 \details{
 This is basically just an extension of \link[tRakt]{trakt.show.season}, which is used in
 this function to collect all the episode data.
 If you only want the episode data for a single season anyway, \code{trakt.show.season}
-is recommended.
+is recommended, yet this function makes some additions.
 }
 \note{
 This function is mainly for convenience.
@@ -39,5 +39,16 @@ This function is mainly for convenience.
 get_trakt_credentials() # Set required API data/headers
 breakingbad.episodes <- trakt.getEpisodeData("breaking-bad", c(1, 2, 3, 4, 5))
 }
+}
+\seealso{
+Other show: \code{\link{trakt.getFullShowData}};
+  \code{\link{trakt.getSeasons}};
+  \code{\link{trakt.show.people}};
+  \code{\link{trakt.show.related}};
+  \code{\link{trakt.show.season}};
+  \code{\link{trakt.show.stats}};
+  \code{\link{trakt.show.summary}};
+  \code{\link{trakt.shows.popular}};
+  \code{\link{trakt.shows.trending}}
 }
 

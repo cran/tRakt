@@ -7,6 +7,7 @@
 #' @return A \code{data.frame} containing stats.
 #' @export
 #' @note See \href{http://docs.trakt.apiary.io/#reference/users/ratings/get-watchlist}{the trakt API docs for further info}
+#' @family user
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
@@ -40,7 +41,8 @@ trakt.user.watchlist <- function(user = getOption("trakt.username"), type = "sho
     response  <- cbind(subset(response, select = -movie), response$movie)
     response  <- cbind(subset(response, select = -ids), response$ids)
   }
-  response$listed_at  <- lubridate::parse_date_time(response$listed_at, "%y-%m-%dT%H-%M-%S", truncated = 3)
+  response$listed_at  <- lubridate::parse_date_time(response$listed_at,
+                                                    "%y-%m-%dT%H-%M-%S", truncated = 3)
 
   return(response)
 }

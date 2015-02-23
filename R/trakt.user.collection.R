@@ -8,6 +8,7 @@
 #' @return A \code{data.frame} containing stats
 #' @export
 #' @note See \href{http://docs.trakt.apiary.io/reference/users/collection/get-collection}{the trakt API docs for further info}
+#' @family user
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
@@ -73,8 +74,8 @@ trakt.user.collection <- function(user = getOption("trakt.username"), type = "sh
     stop("Unknown type, must be 'shows' or 'movies'")
   }
 
-  watched$collected.posix  <- lubridate::parse_date_time(watched$collected_at, "%y-%m-%dT%H-%M-%S", truncated = 3)
-  watched$collected.year   <- lubridate::year(watched$collected.posix)
+  watched$collected_at   <- lubridate::parse_date_time(watched$collected_at, "%y-%m-%dT%H-%M-%S", truncated = 3)
+  watched$collected.year <- lubridate::year(watched$collected_at)
 
   return(watched)
 }

@@ -13,10 +13,10 @@ trakt.show.related(target)
 A \code{data.frame} containing search results
 }
 \description{
-\code{trakt.show.related} returns related shows to the search query.
+\code{trakt.show.related} returns shows related to the input show.
 }
 \details{
-Search for related shows to the show you specified.
+Receive a set of shows that are related to a specific show.
 }
 \note{
 See \href{http://docs.trakt.apiary.io/#reference/shows/related/get-related-shows}{the trakt API docs for further info}
@@ -26,5 +26,16 @@ See \href{http://docs.trakt.apiary.io/#reference/shows/related/get-related-shows
 get_trakt_credentials() # Set required API data/headers
 related <- trakt.show.related("game-of-thrones")
 }
+}
+\seealso{
+Other show: \code{\link{trakt.getEpisodeData}};
+  \code{\link{trakt.getFullShowData}};
+  \code{\link{trakt.getSeasons}};
+  \code{\link{trakt.show.people}};
+  \code{\link{trakt.show.season}};
+  \code{\link{trakt.show.stats}};
+  \code{\link{trakt.show.summary}};
+  \code{\link{trakt.shows.popular}};
+  \code{\link{trakt.shows.trending}}
 }
 

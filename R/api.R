@@ -3,7 +3,7 @@
 #' \code{get_trakt_credentials} searches for your credentials and stores them
 #' in the appropriate \code{option} variables.
 #' It also sets the HTTP header required for v2 API calls.
-#' To make this work, place a \code{key.json} file either in the working directory
+#' To make this work automatically, place a \code{key.json} file either in the working directory
 #' or in \code{~/.config/trakt/key.json}.
 #' Arguments to this function take precedence over any key file.
 #'
@@ -12,13 +12,14 @@
 #' @param client.secret Explicitly set your APIv2 client secret
 #' @param set.headers \code{TRUE} by default. Sets the \code{httr} headers
 #' for \code{GET} requests for the APIv2
-#' @param silent If TRUE (default), messages are printed showing you the API information.
+#' @param silent If TRUE (default), no messages are printed showing you the API information.
 #' Mostly for debug purposes.
 #' @return Nothing. Only messages.
 #' @export
 #' @importFrom jsonlite fromJSON
 #' @note Please note that no oauth2 methods are supported yet,
 #' only client id really matters.
+#' @family API
 #' @examples
 #' \dontrun{
 #' # Use a key.json
@@ -40,19 +41,18 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
     keyfile <- NULL
   }
   if (!(is.null(keyfile))){
-    message(paste("Reading credentials from", keyfile))
+    if (!silent) message(paste("Reading credentials from", keyfile))
   } else {
-    message("No keyfile set/found")
+    if (!silent) message("No keyfile set/found")
   }
 
   # Setting username (just in case)
   if (!is.null(username)){
-    message("Setting trakt username to ", username)
     options(trakt.username = username)
   } else if (!(is.null(keyfile))){
     options(trakt.username = jsonlite::fromJSON(keyfile)[["username"]])
   } else {
-    warning("Couldn't find your username")
+    if (!silent) warning("Couldn't find your username")
   }
 
   # Setting v2 client id
@@ -61,7 +61,7 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
   } else if (!(is.null(keyfile))){
     options(trakt.client.id = jsonlite::fromJSON(keyfile)[["client.id"]])
   } else {
-    warning("Couldn't find your client id")
+    if (!silent) warning("Couldn't find your client id")
   }
 
   # Setting v2 client secret (not used yet)
@@ -70,7 +70,7 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
   } else if (!(is.null(keyfile))){
     options(trakt.client.secret = jsonlite::fromJSON(keyfile)[["client.secret"]])
   } else {
-    warning("Couldn't find your client secret")
+    if (!silent) warning("Couldn't find your client secret")
   }
 
   if (!silent){
@@ -97,7 +97,7 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
 #' Make an APIv2 call to any URL
 #'
 #' \code{trakt.api.call} makes an APIv2 call to a specified URL
-#' and returns the output \code{jsonlite::fromJSON}'d.
+#' and returns the output \code{jsonlite::fromJSON}'d if requested.
 #'
 #' @param url APIv2 method. See \href{http://docs.trakt.apiary.io/}{the trakt API}.
 #' @param headers HTTP headers to set. Must be result of \code{httr::add_headers}.
@@ -109,17 +109,18 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
 #' @import httr
 #' @importFrom jsonlite fromJSON
 #' @note This function is heavily used internally, so why not expose it to the user.
+#' @family API
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
 #' trakt.api.call("https://api-v2launch.trakt.tv/shows/breaking-bad?extended=min")
 #' }
 trakt.api.call <- function(url, headers = getOption("trakt.headers"), fromJSONify = TRUE){
-  response    <- httr::GET(url, headers)
+  response   <- httr::GET(url, headers)
   httr::stop_for_status(response) # In case trakt fails
-  response    <- httr::content(response, as = "text")
+  response   <- httr::content(response, as = "text")
   if (fromJSONify){
-    response  <- jsonlite::fromJSON(response)
+    response <- jsonlite::fromJSON(response)
   }
   return(response)
 }
