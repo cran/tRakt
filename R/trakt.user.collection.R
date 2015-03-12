@@ -8,7 +8,7 @@
 #' @return A \code{data.frame} containing stats
 #' @export
 #' @note See \href{http://docs.trakt.apiary.io/reference/users/collection/get-collection}{the trakt API docs for further info}
-#' @family user
+#' @family user data
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
@@ -16,19 +16,13 @@
 #' seans.movies <- trakt.user.collection(user = "sean", type = "movies)
 #' }
 trakt.user.collection <- function(user = getOption("trakt.username"), type = "shows"){
-  if (is.null(getOption("trakt.headers"))){
-    stop("HTTP headers not set, see ?get_trakt_credentials")
-  }
   if (is.null(user) && is.null(getOption("trakt.username"))){
     stop("No username is set.")
   }
 
-  # Construct URL
-  baseURL   <- "https://api-v2launch.trakt.tv/users"
-  url       <- paste0(baseURL, "/", user, "/collection/", type)
-
-  # Actual API call
-  response  <- trakt.api.call(url = url)
+  # Construct URL, make API call
+  url      <- build_trakt_url("users", user, "collection", type)
+  response <- trakt.api.call(url = url)
 
   if (type == "shows"){
 
@@ -37,8 +31,7 @@ trakt.user.collection <- function(user = getOption("trakt.username"), type = "sh
       response$seasons[[i]]$episodes <- response$seasons[[i]]$episodes[response$seasons[[i]]$number != 0]
     }
 
-    epstats <- NULL
-    for (show in 1:nrow(response)){
+    epstats <- plyr::ldply(1:nrow(response), function(show){
       title <- response[show, ]$show$title
       #print(paste(show, title))
       x      <- response$seasons[[show]]
@@ -58,23 +51,20 @@ trakt.user.collection <- function(user = getOption("trakt.username"), type = "sh
 
       temp$title  <- title
       names(temp) <- sub("number", "episode", names(temp))
-      epstats <- rbind(temp, epstats)
-    }
+      return(temp)
+    })
+
     watched <- epstats[c("title", "season", "episode", "collected_at")]
   } else if (type == "movies"){
     # Flatten out ids
-    movies           <- response$movie[c("title", "year")]
-    movies$slug      <- response$movie$ids$slug
-    movies$id.trakt  <- response$movie$ids$trakt
-    movies$id.imdb   <- response$movie$ids$imdb
-    movies$id.tmdb   <- response$movie$ids$tmdb
+    movies  <- cbind(response$movie[names(response$movie) != "ids"], response$movie$ids)
 
-    watched <- cbind(response["collected_at"], movies)
+    watched <- cbind(response[names(response) != "movie"], movies)
   } else {
     stop("Unknown type, must be 'shows' or 'movies'")
   }
-
-  watched$collected_at   <- lubridate::parse_date_time(watched$collected_at, "%y-%m-%dT%H-%M-%S", truncated = 3)
+  # To be sure
+  watched                <- convert_datetime(watched)
   watched$collected.year <- lubridate::year(watched$collected_at)
 
   return(watched)

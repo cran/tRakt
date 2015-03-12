@@ -19,7 +19,7 @@
 #' @importFrom jsonlite fromJSON
 #' @note Please note that no oauth2 methods are supported yet,
 #' only client id really matters.
-#' @family API
+#' @family API-basics
 #' @examples
 #' \dontrun{
 #' # Use a key.json
@@ -79,7 +79,11 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
     message(paste("Your trakt.tv username is set to",   getOption('trakt.username')))
     message(paste("Your APIv2 client id is set to",     getOption('trakt.client.id')))
     message("Your APIv2 client secret is set (not displayed for privacy reasons)")
+  }
 
+  if (is.null(getOption("trakt.client.id"))){
+    options(trakt.client.id = "12fc1de7671c7f2fb4a8ac08ba7c9f45b447f4d5bad5e11e3490823d629afdf2")
+    warning("I provided my client.id as a fallback for you. Use it responsibly.")
   }
 
   # Set the appropriate header for httr::GET
@@ -104,23 +108,32 @@ get_trakt_credentials <- function(username = NULL, client.id = NULL,
 #' Default value is \code{getOption("trakt.headers")} set by \link[tRakt]{get_trakt_credentials}.
 #' @param fromJSONify If \code{TRUE} (default), the API response will be converted to an object via
 #' \code{jsonlite::fromJSON}
+#' @param convert.datetime If \code{TRUE} (default), datetime variables are converted to
+#' \code{POSIXct}. Requires \code{fromJSONify} to be \code{TRUE} as well.
 #' @return The content of the API response, \code{jsonlite::fromJSON}'d if requested.
 #' @export
 #' @import httr
 #' @importFrom jsonlite fromJSON
 #' @note This function is heavily used internally, so why not expose it to the user.
-#' @family API
+#' @family API-basics
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
 #' trakt.api.call("https://api-v2launch.trakt.tv/shows/breaking-bad?extended=min")
 #' }
-trakt.api.call <- function(url, headers = getOption("trakt.headers"), fromJSONify = TRUE){
+trakt.api.call <- function(url, headers = getOption("trakt.headers"), fromJSONify = TRUE,
+                           convert.datetime = TRUE){
+  if (is.null(headers) & is.null(getOption("trakt.headers"))){
+    stop("HTTP headers not set, see ?get_trakt_credentials")
+  }
   response   <- httr::GET(url, headers)
   httr::stop_for_status(response) # In case trakt fails
   response   <- httr::content(response, as = "text")
   if (fromJSONify){
     response <- jsonlite::fromJSON(response)
+    if (convert.datetime){
+      response <- convert_datetime(response)
+    }
   }
   return(response)
 }

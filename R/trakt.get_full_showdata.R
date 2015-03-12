@@ -1,6 +1,6 @@
 #' Get all the show data
 #'
-#' \code{trakt.getFullShowData} is a combination function of multiple
+#' \code{trakt.get_full_showdata} is a combination function of multiple
 #' functions in this package. The idea is to easily execute all major functions
 #' required to get a full show dataset.
 #'
@@ -12,19 +12,17 @@
 #' @note This is primarily intended to be a convenience function for the case where you
 #' really want all that data. If you're just derping around, maybe you should consider interactively
 #' calling the other functions.
-#' @family show
+#' @family show data
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
 #' # Use the search within the function
-#' breakingbad <- trakt.getFullShowData("Breaking Bad")
+#' breakingbad <- trakt.get_full_showdata("Breaking Bad")
 #' # Alternatively, us a slug for explicit results
-#' breakingbad <- trakt.getFullShowData(slug = "breaking-bad")
+#' breakingbad <- trakt.get_full_showdata(slug = "breaking-bad")
 #' }
-trakt.getFullShowData <- function(query = NULL, slug = NULL, dropunaired = TRUE){
-  if (is.null(getOption("trakt.headers"))){
-    stop("HTTP headers not set, see ?get_trakt_credentials")
-  }
+trakt.get_full_showdata <- function(query = NULL, slug = NULL, dropunaired = TRUE){
+
   # Bind variables later used to please R CMD CHECK
   rating  <- NULL
 
@@ -37,8 +35,8 @@ trakt.getFullShowData <- function(query = NULL, slug = NULL, dropunaired = TRUE)
     stop("You must provide either a search query or a trakt.tv slug")
   }
   show$summary  <- trakt.show.summary(slug, extended = "full")
-  show$seasons  <- trakt.getSeasons(slug, extended = "full", dropspecials = T)
-  show$episodes <- trakt.getEpisodeData(slug, show$seasons$season,
+  show$seasons  <- trakt.seasons.summary(slug, extended = "full", dropspecials = TRUE)
+  show$episodes <- trakt.get_all_episodes(slug, show$seasons$season,
                                         dropunaired = dropunaired, extended = "full")
   show$seasons  <- plyr::join(show$seasons , plyr::ddply(show$episodes, "season", plyr::summarize,
                                                         avg.rating.season     = round(mean(rating), 1),

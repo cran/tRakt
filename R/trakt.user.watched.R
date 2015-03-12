@@ -11,7 +11,7 @@
 #' the returned \code{data.frame} only contains play stats per show or movie respectively.
 #' @export
 #' @note See \href{http://docs.trakt.apiary.io/reference/users/watched/get-watched}{the trakt API docs for further info}
-#' @family user
+#' @family user data
 #' @examples
 #' \dontrun{
 #' get_trakt_credentials() # Set required API data/headers
@@ -19,34 +19,26 @@
 #' seans.shows <- trakt.user.watched(user = "sean")
 #' }
 trakt.user.watched <- function(user = getOption("trakt.username"), type = "shows"){
-  if (is.null(getOption("trakt.headers"))){
-    stop("HTTP headers not set, see ?get_trakt_credentials")
-  }
   if (is.null(user) && is.null(getOption("trakt.username"))){
     stop("No username is set.")
   }
 
-  # Construct URL
-  baseURL   <- "https://api-v2launch.trakt.tv/users"
-  url       <- paste0(baseURL, "/", user, "/watched/", type)
-
-  # Actual API call
-  response  <- trakt.api.call(url = url)
+  # Construct URL, make API call
+  url      <- build_trakt_url("users", user, "watched", type)
+  response <- trakt.api.call(url = url)
 
   if (type == "shows"){
     # Flatten out ids
-    shows           <- response$show[c("title", "year")]
-    shows$slug      <- response$show$ids$slug
-    shows$id.trakt  <- response$show$ids$trakt
-    shows$id.imdb   <- response$show$ids$imdb
-    shows$id.tvdb   <- response$show$ids$tvdb
-    shows$id.tvrage <- response$show$ids$tvrage
+    shows         <- cbind(response$show[!(names(response$show) %in% c("ids", "seasons"))],
+                           response$show$ids)
 
     # Try to get some stuff out of response$seasons
     shows$seasons  <- sapply(response$seasons, function(x){max(x[[1]])})
-    shows$episodes <- length(sapply(response$seasons, function(x){x[[2]]}))
+    shows$episodes <- sapply(response$seasons, function(show){
+                             sum(sapply(show[[2]], nrow))
+                             })
 
-    watched <- cbind(response[c("plays", "last_watched_at")], shows)
+    watched <- cbind(response[!(names(response) %in% c("show", "seasons"))], shows)
 
   } else if (type == "shows.extended"){
 
@@ -55,8 +47,7 @@ trakt.user.watched <- function(user = getOption("trakt.username"), type = "shows
       response$seasons[[i]]$episodes <- response$seasons[[i]]$episodes[response$seasons[[i]]$number != 0]
     }
 
-    epstats <- NULL
-    for (show in 1:nrow(response)){
+    epstats <- plyr::ldply(1:nrow(response), function(show){
       title <- response[show, ]$show$title
       #print(paste(show, title))
       x      <- response$seasons[[show]]
@@ -76,24 +67,20 @@ trakt.user.watched <- function(user = getOption("trakt.username"), type = "shows
 
       temp$title  <- title
       names(temp) <- sub("number", "episode", names(temp))
-      epstats     <- rbind(temp, epstats)
-    }
+      return(temp)
+    })
+
     watched <- epstats[c("title", "season", "episode", "plays", "last_watched_at")]
   } else if (type == "movies"){
     # Flatten out ids
-    movies          <- response$movie[c("title", "year")]
-    movies$slug     <- response$movie$ids$slug
-    movies$id.trakt <- response$movie$ids$trakt
-    movies$id.imdb  <- response$movie$ids$imdb
-    movies$id.tmdb  <- response$movie$ids$tmdb
+    movies  <- cbind(response$movie[names(response$movie) != "ids"], response$movie$ids)
 
-    watched <- cbind(response[c("plays", "last_watched_at")], movies)
+    watched <- cbind(response[names(response) != "movie"], movies)
   } else {
     stop("Unknown type, must be 'shows', 'shows.extended', or 'movies'")
   }
-
-  watched$last_watched_at  <- lubridate::parse_date_time(watched$last_watched_at,
-                                                           "%y-%m-%dT%H-%M-%S", truncated = 3)
+  # To be sure
+  watched                   <- convert_datetime(watched)
   watched$last_watched.year <- lubridate::year(watched$last_watched_at)
 
   return(watched)

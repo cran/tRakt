@@ -27,8 +27,8 @@ slug          <- show$ids$slug
 slug
 
 # Get the season & episode data
-show.seasons  <- trakt.getSeasons(slug) # How many seasons are there?
-show.episodes <- trakt.getEpisodeData(slug, show.seasons$season, extended = "full")
+show.seasons  <- trakt.seasons.summary(slug, extended = "full") # How many seasons are there?
+show.episodes <- trakt.get_all_episodes(slug, show.seasons$season, extended = "full")
 
 # Glimpse at data (only some columns each)
 rownames(show.seasons) <- NULL # This shouldn't be necessary
